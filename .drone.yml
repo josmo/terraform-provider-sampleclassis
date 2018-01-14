@@ -1,0 +1,39 @@
+workspace:
+  base: /go
+  path: src/github.com/josmo/${DRONE_REPO_NAME}
+pipeline:
+  test:
+    image: golang:1.9
+    commands:
+      - go vet
+      - go test ./classis -cover -coverprofile=coverage.out
+  build_linux_amd64:
+    image: golang:1.9
+    group: build
+    environment:
+      - GOOS=linux
+      - GOARCH=amd64
+      - CGO_ENABLED=0
+    commands:
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/${DRONE_REPO_NAME}
+
+  build_osx_amd64:
+    image: golang:1.9
+    group: build
+    environment:
+      - GOOS=darwin
+      - GOARCH=amd64
+      - CGO_ENABLED=0
+    commands:
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/darwin/amd64/${DRONE_REPO_NAME}
+  
+  build_windows_amd64:
+    image: golang:1.9
+    group: build
+    environment:
+      - GOOS=windows
+      - GOARCH=amd64
+      - CGO_ENABLED=0
+    commands:
+      - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/windows/amd64/${DRONE_REPO_NAME}
+
