@@ -31,7 +31,9 @@ func Provider() terraform.ResourceProvider {
 				Description: "password for classis",
 			},
 		},
-		ResourcesMap:  map[string]*schema.Resource{},
+		ResourcesMap:  map[string]*schema.Resource{
+			"sampleclassis_aws_spot_group": resourceAwsSpotGroupObject(),
+		},
 		ConfigureFunc: configureProvider,
 	}
 }

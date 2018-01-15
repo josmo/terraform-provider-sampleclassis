@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"github.com/hashicorp/go-uuid"
 )
 
 type Client struct {
@@ -48,3 +49,45 @@ func NewClientWith(url string, username string, password string) (*Client, error
 	}
 	return &Client{netClient, url, loginResponse.Token}, nil
 }
+
+func (c *Client) CreateSpotGroup(spotGroup SpotGroup) (string, error) {
+	var a [2]interface{}
+	generatedUID, err := uuid.GenerateUUID()
+	a[0] = generatedUID
+	a[1] = spotGroup
+	spotBytes, _ := json.Marshal(a)
+	spotReader := bytes.NewReader(spotBytes)
+
+	req, err := http.NewRequest("POST", c.base+"/methods/sgUpsert", spotReader)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	response, err := c.client.Do(req)
+
+
+	defer response.Body.Close()
+
+	return generatedUID, err
+}
+
+
+func(c *Client) DeleteSpotGroup(groupId string) error {
+	req, err := http.NewRequest("DELETE", c.base+"/spot-groups/"+groupId, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	response, deleteError := c.client.Do(req)
+	if response.StatusCode == 400 {
+		return errors.New("Sorry but the group must be stopped before it's removed")
+	}
+	if response.StatusCode == 401 {
+		return errors.New("Sorry this is not your spot group")
+	}
+	return deleteError
+}
+
+
