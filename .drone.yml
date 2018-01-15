@@ -26,6 +26,8 @@ pipeline:
       - CGO_ENABLED=0
     commands:
       - go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/darwin/amd64/${DRONE_REPO_NAME}
+#      Copy to the plugins directory locally -  really just for development and should fine a better way :)
+      - cp release/darwin/amd64/${DRONE_REPO_NAME} ./terraform.d/plugins/darwin_amd64
   
   build_windows_amd64:
     image: golang:1.9
