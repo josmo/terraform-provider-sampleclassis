@@ -2,6 +2,8 @@
 
 # terraform-provider-sampleclassis
 
+This project is providing the code for talks and a blog post on custom providers. 
+
 ## Building with drone as long as you have the cli
 
 ```sh
